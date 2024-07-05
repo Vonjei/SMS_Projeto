@@ -25,15 +25,8 @@ def obter_parametros_congruente_linear():
 
 # Função para simular chegadas de clientes
 def simular_chegadas_clientes():
-    def obter_media_clientes():
-        return float(input("Informe a média de clientes por dia: "))
-
-    modo = input("Deseja declarar a média de clientes por dia? (sim/não): ").strip().lower()
-    if modo == 'sim':
-        return obter_media_clientes(), None
-    else:
-        print("Opção inválida. Tente novamente.")
-        return simular_chegadas_clientes()
+    media_clientes = float(input("Informe a média de clientes por dia: "))
+    return media_clientes
 
 # Função principal de simulação
 def simular_dia(tempo_simulacao, tempo_medio_atendimento, media_clientes, a, c, m, semente, modo_simulacao):
@@ -124,7 +117,7 @@ def main():
 
     a, c, m, semente = obter_parametros_congruente_linear()
 
-    media_clientes, _ = simular_chegadas_clientes()
+    media_clientes = simular_chegadas_clientes()
 
     modo_simulacao = input("Deseja realizar a simulação em 'Tempo real' ou 'Rápida'? (tempo real/rápida): ").strip().lower()
 
