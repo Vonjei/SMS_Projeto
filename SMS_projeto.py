@@ -6,7 +6,7 @@ import time
 def gerar_numeros_congruentes_linear(a, c, m, semente, tamanho):
     x = semente
     numeros = []
-    for _ in range(tamanho):
+    for in range(tamanho):
         x = (a * x + c) % m
         numeros.append(x / m)
     return numeros
