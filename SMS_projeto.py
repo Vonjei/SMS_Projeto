@@ -2,7 +2,6 @@ import random
 import math
 import time
 
-# Function to generate numbers using the linear congruential generator
 def generate_linear_congruential_numbers(a, c, m, seed, size):
     x = seed
     numbers = []
@@ -11,15 +10,9 @@ def generate_linear_congruential_numbers(a, c, m, seed, size):
         numbers.append(x / m)
     return numbers
 
-# Function to calculate the average of a list
 def calculate_average(lst):
     return sum(lst) / len(lst) if lst else 0
 
-# Function to simulate customer arrivals
-def simulate_customer_arrivals(average_customers):
-    return average_customers
-
-# Main simulation function
 def simulate_day(simulation_time, average_service_time, average_customers, a, c, m, seed, simulation_mode):
     if average_customers <= 0:
         print("Error: Average number of customers must be greater than zero.")
@@ -61,10 +54,12 @@ def simulate_day(simulation_time, average_service_time, average_customers, a, c,
                 print(f"Customer {total_arrivals} approached the counter, but it is occupied.")
 
         # Serve customers in the queue
-        if counter_occupied and current_time >= next_departure_time:
+        while counter_occupied and current_time >= next_departure_time:
             counter_occupied = False
             if queue:  # If there are customers in the queue
                 next_customer = queue.pop(0)
+                wait_time = current_time - next_customer  # Calculate wait time
+                wait_times.append(wait_time)  # Store the wait time
                 service_time = -math.log(1.0 - random.random()) * average_service_time
                 next_departure_time = current_time + service_time
 
@@ -72,6 +67,8 @@ def simulate_day(simulation_time, average_service_time, average_customers, a, c,
                     print(f"Counter: Occupied, serving the next customer in {service_time:.2f} minutes")
                     time.sleep(service_time)  # Simulate service time
                 total_departures += 1
+            else:
+                break  # Exit the loop if no customers are left in the queue
 
     # Calculate statistics
     average_wait_time = calculate_average(wait_times)
