@@ -2,111 +2,111 @@ import random
 import math
 import time
 
-# Função para gerar números usando o gerador congruente linear
-def gerar_numeros_congruentes_linear(a, c, m, semente, tamanho):
-    x = semente
-    numeros = []
-    for _ in range(tamanho):
+# Function to generate numbers using the linear congruential generator
+def generate_linear_congruential_numbers(a, c, m, seed, size):
+    x = seed
+    numbers = []
+    for _ in range(size):
         x = (a * x + c) % m
-        numeros.append(x / m)
-    return numeros
+        numbers.append(x / m)
+    return numbers
 
-# Função para calcular a média de uma lista
-def calcular_media(lista):
-    return sum(lista) / len(lista) if lista else 0
+# Function to calculate the average of a list
+def calculate_average(lst):
+    return sum(lst) / len(lst) if lst else 0
 
-# Função para simular a chegada de clientes
-def simular_chegadas_clientes(media_clientes):
-    return media_clientes
+# Function to simulate customer arrivals
+def simulate_customer_arrivals(average_customers):
+    return average_customers
 
-# Função principal de simulação
-def simular_dia(tempo_simulacao, tempo_medio_atendimento, media_clientes, a, c, m, semente, modo_simulacao):
-    if media_clientes <= 0:
-        print("Erro: Média de clientes deve ser maior que zero.")
+# Main simulation function
+def simulate_day(simulation_time, average_service_time, average_customers, a, c, m, seed, simulation_mode):
+    if average_customers <= 0:
+        print("Error: Average number of customers must be greater than zero.")
         return
 
-    taxa_chegada = 1 / media_clientes
-    numero_eventos = int(media_clientes)
-    numeros_aleatorios = gerar_numeros_congruentes_linear(a, c, m, semente, numero_eventos)
-    tempos_chegada = [-math.log(1.0 - rn) / taxa_chegada for rn in numeros_aleatorios]
+    arrival_rate = 1 / average_customers
+    number_of_events = int(average_customers)
+    random_numbers = generate_linear_congruential_numbers(a, c, m, seed, number_of_events)
+    arrival_times = [-math.log(1.0 - rn) / arrival_rate for rn in random_numbers]
 
-    total_chegadas = 0
-    total_partidas = 0
-    tempo_atual = 0
-    fila = []
-    caixa_ocupada = False
-    proximo_tempo_saida = 0
-    tempos_espera = []
+    total_arrivals = 0
+    total_departures = 0
+    current_time = 0
+    queue = []
+    counter_occupied = False
+    next_departure_time = 0
+    wait_times = []
 
-    for tempo_chegada in tempos_chegada:
-        total_chegadas += 1
-        tempo_atual += tempo_chegada
+    for arrival_time in arrival_times:
+        total_arrivals += 1
+        current_time += arrival_time
 
-        if modo_simulacao == 'tempo real':
-            print(f"\nCliente {total_chegadas} entrou")
-            time.sleep(random.uniform(0.5, 2.0))  # Pausa aleatória
+        if simulation_mode == 'real time':
+            print(f"\nCustomer {total_arrivals} arrived")
+            time.sleep(random.uniform(0.5, 2.0))  # Random pause
 
-        if not caixa_ocupada:
-            caixa_ocupada = True
-            tempo_atendimento = -math.log(1.0 - random.random()) * tempo_medio_atendimento
-            proximo_tempo_saida = tempo_atual + tempo_atendimento
+        if not counter_occupied:
+            counter_occupied = True
+            service_time = -math.log(1.0 - random.random()) * average_service_time
+            next_departure_time = current_time + service_time
 
-            if modo_simulacao == 'tempo real':
-                print(f"Caixa: Ocupado, atendimento do Cliente {total_chegadas} em {tempo_atendimento:.2f} minutos")
-                time.sleep(tempo_atendimento)  # Simula o tempo de atendimento
-            total_partidas += 1
+            if simulation_mode == 'real time':
+                print(f"Counter: Occupied, serving Customer {total_arrivals} in {service_time:.2f} minutes")
+                time.sleep(service_time)  # Simulate service time
+            total_departures += 1
         else:
-            fila.append(tempo_atual)  # Cliente entrou na fila
-            if modo_simulacao == 'tempo real':
-                print(f"Cliente {total_chegadas} foi ao caixa, mas está ocupado.")
+            queue.append(current_time)  # Customer entered the queue
+            if simulation_mode == 'real time':
+                print(f"Customer {total_arrivals} approached the counter, but it is occupied.")
 
-        # Atendimento dos clientes na fila
-        if caixa_ocupada and tempo_atual >= proximo_tempo_saida:
-            caixa_ocupada = False
-            if fila:  # Se há clientes na fila
-                proximo_cliente = fila.pop(0)
-                tempo_atendimento = -math.log(1.0 - random.random()) * tempo_medio_atendimento
-                proximo_tempo_saida = tempo_atual + tempo_atendimento
+        # Serve customers in the queue
+        if counter_occupied and current_time >= next_departure_time:
+            counter_occupied = False
+            if queue:  # If there are customers in the queue
+                next_customer = queue.pop(0)
+                service_time = -math.log(1.0 - random.random()) * average_service_time
+                next_departure_time = current_time + service_time
 
-                if modo_simulacao == 'tempo real':
-                    print(f"Caixa: Ocupado, atendimento do próximo cliente em {tempo_atendimento:.2f} minutos")
-                    time.sleep(tempo_atendimento)  # Simula o tempo de atendimento
-                total_partidas += 1
+                if simulation_mode == 'real time':
+                    print(f"Counter: Occupied, serving the next customer in {service_time:.2f} minutes")
+                    time.sleep(service_time)  # Simulate service time
+                total_departures += 1
 
-    # Cálculo das estatísticas
-    tempo_medio_espera = calcular_media(tempos_espera)
-    media_comprimento_fila = len(fila) / total_chegadas if total_chegadas > 0 else 0
-    ocupacao_servidor = total_partidas / tempo_simulacao
+    # Calculate statistics
+    average_wait_time = calculate_average(wait_times)
+    average_queue_length = len(queue) / total_arrivals if total_arrivals > 0 else 0
+    server_occupancy = total_departures / simulation_time
 
     return {
-        'total_chegadas': total_chegadas,
-        'total_partidas': total_partidas,
-        'tempo_medio_espera': tempo_medio_espera,
-        'media_comprimento_fila': media_comprimento_fila,
-        'ocupacao_servidor': ocupacao_servidor
+        'total_arrivals': total_arrivals,
+        'total_departures': total_departures,
+        'average_wait_time': average_wait_time,
+        'average_queue_length': average_queue_length,
+        'server_occupancy': server_occupancy
     }
 
 def main():
-    print("Simulação de Fila de Servidor Único")
-    tempo_simulacao = float(input("Digite o tempo de simulação (em minutos): "))
-    tempo_medio_atendimento = float(input("Digite o tempo médio de atendimento (em minutos): "))
+    print("Single Server Queue Simulation")
+    simulation_time = float(input("Enter the simulation time (in minutes): "))
+    average_service_time = float(input("Enter the average service time (in minutes): "))
     
-    a = int(input("Digite o valor de 'a' (multiplicador): "))
-    c = int(input("Digite o valor de 'c' (incremento): "))
-    m = int(input("Digite o valor de 'm' (módulo): "))
-    semente = int(input("Digite o valor da semente inicial (x0): "))
+    a = int(input("Enter the value of 'a' (multiplier): "))
+    c = int(input("Enter the value of 'c' (increment): "))
+    m = int(input("Enter the value of 'm' (modulus): "))
+    seed = int(input("Enter the initial seed value (x0): "))
     
-    media_clientes = float(input("Informe a média de clientes por dia: "))
-    modo_simulacao = input("Deseja realizar a simulação em 'Tempo real' ou 'Rápida'? (tempo real/rápida): ").strip().lower()
+    average_customers = float(input("Enter the average number of customers per day: "))
+    simulation_mode = input("Would you like to run the simulation in 'Real time' or 'Fast'? (real time/fast): ").strip().lower()
 
-    resultado = simular_dia(tempo_simulacao, tempo_medio_atendimento, media_clientes, a, c, m, semente, modo_simulacao)
+    result = simulate_day(simulation_time, average_service_time, average_customers, a, c, m, seed, simulation_mode)
 
-    print("\nEstatísticas da simulação:")
-    print(f'Total de chegadas: {resultado["total_chegadas"]}')
-    print(f'Total de partidas: {resultado["total_partidas"]}')
-    print(f'Tempo médio de espera: {resultado["tempo_medio_espera"]:.2f} minutos')
-    print(f'Média do comprimento da fila: {resultado["media_comprimento_fila"]:.2f}')
-    print(f'Ocupação do servidor: {resultado["ocupacao_servidor"]:.2f}')
+    print("\nSimulation Statistics:")
+    print(f'Total arrivals: {result["total_arrivals"]}')
+    print(f'Total departures: {result["total_departures"]}')
+    print(f'Average wait time: {result["average_wait_time"]:.2f} minutes')
+    print(f'Average queue length: {result["average_queue_length"]:.2f}')
+    print(f'Server occupancy: {result["server_occupancy"]:.2f}')
 
 if __name__ == "__main__":
     main()
