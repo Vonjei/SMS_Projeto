@@ -1,2 +1,2 @@
-# SimulatioAndSystemModeling Project
+# SimulationAndSystemModeling Project
 A university project that simulates the operation of a service queue on a single server, using a linear congruent generator to model customer arrivals. The simulation makes it possible to analyze the system's performance, such as average waiting time and server occupancy. The user enters parameters such as simulation time, average service time and average number of customers, and the system generates statistics that help to understand the dynamics of queues in customer service environments.
